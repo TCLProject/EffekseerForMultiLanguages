@@ -22,10 +22,6 @@ jobs:
             scriptExt: "bat"
             libExt: "dll"
             name: "windows"
-          - os: macos-latest
-            scriptExt: "sh"
-            libExt: "dylib"
-            name: "macos"
     name: Build Natives - ${{ matrix.name }}
     runs-on:  ${{ matrix.os }}
     steps:
