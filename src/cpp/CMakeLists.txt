@@ -32,28 +32,6 @@ endif()
 
 
 
-find_package(PythonLibs)
-
-  add_library(EffekseerNativeForPython
-      SHARED
-      python/dll.cpp
-  )
-
-  target_include_directories(
-    EffekseerNativeForPython
-    PRIVATE
-    Effekseer/Dev/Cpp/Effekseer/
-    Effekseer/Dev/Cpp/EffekseerRendererGL/
-    ${PYTHON_INCLUDE_DIRS}
-  )
-
-  target_link_libraries(EffekseerNativeForPython
-    PRIVATE
-    Effekseer
-    EffekseerRendererGL
-    EffekseerCore
-    ${PYTHON_LIBRARIES}
-  )
 
 add_library(EffekseerNativeForCSharp
   SHARED
