@@ -2,7 +2,6 @@
 #include "EffekseerBackendCore.h"
 #include "EffekseerEffectCore.h"
 #include <EffekseerRendererGL.h>
-#include "EffekseerRenderer/GraphicsDevice.h"
 
 inline void matrixFromValues(::Effekseer::Matrix44& matrix, 
 	float matrixArray0,
@@ -148,45 +147,7 @@ void EffekseerManagerCore::UpdateHandleToMoveToFrame(int handle,float v){
 }
 
 
-void EffekseerManagerCore::UnsetBackground(){
-	renderer_->SetBackground(nullptr);
-}
 
-void EffekseerManagerCore::SetBackground(uint32_t glid,bool hasMipmap){
-	if(backgroundtx_==nullptr){
-		backgroundtx_=::EffekseerRendererGL::CreateTexture(renderer_->GetGraphicsDevice(),glid,hasMipmap,nullptr);
-	}
-	auto texture = static_cast<::EffekseerRendererGL::Backend::Texture*>(backgroundtx_.Get());
-	texture->Init(glid, hasMipmap, nullptr);
-	renderer_->SetBackground(backgroundtx_);
-}
-
-void EffekseerManagerCore::SetDepth(uint32_t glid, bool hasMipmap){
-	if(depthtx_==nullptr){
-		depthtx_=::EffekseerRendererGL::CreateTexture(renderer_->GetGraphicsDevice(),glid,hasMipmap,nullptr);
-	}else{
-		auto texture = static_cast<::EffekseerRendererGL::Backend::Texture*>(depthtx_.Get());
-		texture->Init(glid, hasMipmap, nullptr);
-	}
-
-	auto projMat = renderer_->GetProjectionMatrix();
-
-	::EffekseerRenderer::DepthReconstructionParameter params;	
-	params.DepthBufferScale = 1.0f;
-	params.DepthBufferOffset = 0.0f;		
-
-	params.ProjectionMatrix33 = projMat.Values[2][2];
-	params.ProjectionMatrix43 = projMat.Values[2][3];
-	params.ProjectionMatrix34 = projMat.Values[3][2];
-	params.ProjectionMatrix44 = projMat.Values[3][3];
-
-	renderer_->SetDepth(depthtx_,params);	
-}
-
-void EffekseerManagerCore::UnsetDepth(){
-	::EffekseerRenderer::DepthReconstructionParameter params;
-	renderer_->SetDepth(nullptr,params);	
-}
 
 void EffekseerManagerCore::LaunchWorkerThreads(int32_t n){
 	manager_->LaunchWorkerThreads(n);
@@ -256,7 +217,7 @@ void EffekseerManagerCore::SetPaused(int handle, bool v)
 	manager_->SetPaused(handle,v);
 }
 
-void EffekseerManagerCore::DrawBack(int layer)
+void EffekseerManagerCore::DrawBack()
 {
 	if (manager_ == nullptr)
 	{
@@ -264,15 +225,11 @@ void EffekseerManagerCore::DrawBack(int layer)
 	}
 
 	renderer_->BeginRendering();
-	
-	Effekseer::Manager::DrawParameter params;
-	params.CameraCullingMask=layer;
-	manager_->DrawBack(params);	
-	
+	manager_->DrawBack();
 	renderer_->EndRendering();
 }
 
-void EffekseerManagerCore::DrawFront(int layer)
+void EffekseerManagerCore::DrawFront()
 {
 	if (manager_ == nullptr)
 	{
@@ -280,17 +237,8 @@ void EffekseerManagerCore::DrawFront(int layer)
 	}
 	
 	renderer_->BeginRendering();
-	
-	Effekseer::Manager::DrawParameter params;
-	params.CameraCullingMask=layer;
-	manager_->DrawFront(params);
-
+	manager_->DrawFront();
 	renderer_->EndRendering();
-}
-
-void EffekseerManagerCore::SetLayer(int handle,int layer)
-{
-	return manager_->SetLayer(handle,layer);
 }
 
 bool EffekseerManagerCore::Exists(int handle)
